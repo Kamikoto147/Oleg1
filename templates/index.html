@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oleg Messenger</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Экран входа/регистрации -->
+        <div id="login-screen" class="screen">
+            <div class="login-container">
+                <div class="logo">
+                    <h1><i class="fas fa-comments"></i> Oleg Messenger</h1>
+                    <p>Ваш личный мессенджер</p>
+                </div>
+                
+                <div class="login-form">
+                    <div class="form-group">
+                        <input type="text" id="username-input" placeholder="Введите имя пользователя" maxlength="20">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password-input" placeholder="Введите пароль" maxlength="32">
+                    </div>
+                    <div class="form-buttons">
+                        <button id="login-btn" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Войти
+                        </button>
+                        <button id="register-btn" class="btn btn-secondary">
+                            <i class="fas fa-user-plus"></i> Регистрация
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="login-error" class="error-message"></div>
+            </div>
+        </div>
+
+        <!-- Основной интерфейс мессенджера -->
+        <div id="chat-screen" class="hidden">
+            <div class="chat-container">
+                <!-- Боковая панель -->
+                <div class="sidebar">
+                    <div class="sidebar-header">
+                        <h3><i class="fas fa-comments"></i> Oleg</h3>
+                        <div class="user-info">
+                            <span id="current-username"></span>
+                            <button id="theme-toggle-btn" class="btn-icon" title="Переключить тему">
+                                <i class="fas fa-moon"></i>
+                            </button>
+                            <button id="logout-btn" class="btn-icon" title="Выйти">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-content">
+                        <div class="section">
+                            <h4><i class="fas fa-users"></i> Пользователи онлайн</h4>
+                            <div id="users-list" class="users-list"></div>
+                        </div>
+                        
+                        <div class="section">
+                            <h4><i class="fas fa-hashtag"></i> Комнаты</h4>
+                            <div class="room-controls">
+                                <input type="text" id="new-room-input" placeholder="Новая комната">
+                                <button id="create-room-btn" class="btn-icon" title="Создать комнату">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <div id="rooms-list" class="rooms-list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Область чата -->
+                <div class="chat-area">
+                    <div class="chat-header">
+                        <h3 id="current-room">Выберите комнату</h3>
+                        <div class="room-info">
+                            <span id="room-users-count">0 пользователей</span>
+                        </div>
+                    </div>
+                    
+                    <div class="search-container">
+                        <div class="search-wrapper">
+                            <input type="text" id="search-input" placeholder="Поиск по сообщениям..." disabled>
+                            <button id="search-btn" class="btn-search" disabled>
+                                <i class="fas fa-search"></i>
+                            </button>
+                            <button id="clear-search-btn" class="btn-clear-search hidden">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="messages-container">
+                        <div id="messages-list" class="messages-list"></div>
+                    </div>
+                    
+                    <div class="message-input-container">
+                        <div class="message-input-wrapper">
+                            <button id="file-btn" class="btn-file" title="Прикрепить файл">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <input type="file" id="file-input" accept="image/*,.pdf,.doc,.docx,.txt" style="display: none;">
+                            <button id="emoji-btn" class="btn-emoji" title="Эмодзи">
+                                <i class="fas fa-smile"></i>
+                            </button>
+                            <input type="text" id="message-input" placeholder="Введите сообщение..." disabled>
+                            <button id="send-btn" class="btn-send" disabled>
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div id="file-preview" class="file-preview hidden"></div>
+                        <div id="emoji-picker" class="emoji-picker hidden">
+                            <div class="emoji-grid">
+                                <span class="emoji" data-emoji="😀">😀</span>
+                                <span class="emoji" data-emoji="😃">😃</span>
+                                <span class="emoji" data-emoji="😄">😄</span>
+                                <span class="emoji" data-emoji="😁">😁</span>
+                                <span class="emoji" data-emoji="😆">😆</span>
+                                <span class="emoji" data-emoji="😅">😅</span>
+                                <span class="emoji" data-emoji="😂">😂</span>
+                                <span class="emoji" data-emoji="🤣">🤣</span>
+                                <span class="emoji" data-emoji="😊">😊</span>
+                                <span class="emoji" data-emoji="😇">😇</span>
+                                <span class="emoji" data-emoji="🙂">🙂</span>
+                                <span class="emoji" data-emoji="🙃">🙃</span>
+                                <span class="emoji" data-emoji="😉">😉</span>
+                                <span class="emoji" data-emoji="😌">😌</span>
+                                <span class="emoji" data-emoji="😍">😍</span>
+                                <span class="emoji" data-emoji="🥰">🥰</span>
+                                <span class="emoji" data-emoji="😘">😘</span>
+                                <span class="emoji" data-emoji="😗">😗</span>
+                                <span class="emoji" data-emoji="😙">😙</span>
+                                <span class="emoji" data-emoji="😚">😚</span>
+                                <span class="emoji" data-emoji="😋">😋</span>
+                                <span class="emoji" data-emoji="😛">😛</span>
+                                <span class="emoji" data-emoji="😝">😝</span>
+                                <span class="emoji" data-emoji="😜">😜</span>
+                                <span class="emoji" data-emoji="🤪">🤪</span>
+                                <span class="emoji" data-emoji="🤨">🤨</span>
+                                <span class="emoji" data-emoji="🧐">🧐</span>
+                                <span class="emoji" data-emoji="🤓">🤓</span>
+                                <span class="emoji" data-emoji="😎">😎</span>
+                                <span class="emoji" data-emoji="🤩">🤩</span>
+                                <span class="emoji" data-emoji="🥳">🥳</span>
+                                <span class="emoji" data-emoji="😏">😏</span>
+                                <span class="emoji" data-emoji="😒">😒</span>
+                                <span class="emoji" data-emoji="😞">😞</span>
+                                <span class="emoji" data-emoji="😔">😔</span>
+                                <span class="emoji" data-emoji="😟">😟</span>
+                                <span class="emoji" data-emoji="😕">😕</span>
+                                <span class="emoji" data-emoji="🙁">🙁</span>
+                                <span class="emoji" data-emoji="☹️">☹️</span>
+                                <span class="emoji" data-emoji="😣">😣</span>
+                                <span class="emoji" data-emoji="😖">😖</span>
+                                <span class="emoji" data-emoji="😫">😫</span>
+                                <span class="emoji" data-emoji="😩">😩</span>
+                                <span class="emoji" data-emoji="🥺">🥺</span>
+                                <span class="emoji" data-emoji="😢">😢</span>
+                                <span class="emoji" data-emoji="😭">😭</span>
+                                <span class="emoji" data-emoji="😤">😤</span>
+                                <span class="emoji" data-emoji="😠">😠</span>
+                                <span class="emoji" data-emoji="😡">😡</span>
+                                <span class="emoji" data-emoji="🤬">🤬</span>
+                                <span class="emoji" data-emoji="🤯">🤯</span>
+                                <span class="emoji" data-emoji="😳">😳</span>
+                                <span class="emoji" data-emoji="🥵">🥵</span>
+                                <span class="emoji" data-emoji="🥶">🥶</span>
+                                <span class="emoji" data-emoji="😱">😱</span>
+                                <span class="emoji" data-emoji="😨">😨</span>
+                                <span class="emoji" data-emoji="😰">😰</span>
+                                <span class="emoji" data-emoji="😥">😥</span>
+                                <span class="emoji" data-emoji="😓">😓</span>
+                                <span class="emoji" data-emoji="🤗">🤗</span>
+                                <span class="emoji" data-emoji="🤔">🤔</span>
+                                <span class="emoji" data-emoji="🤭">🤭</span>
+                                <span class="emoji" data-emoji="🤫">🤫</span>
+                                <span class="emoji" data-emoji="🤥">🤥</span>
+                                <span class="emoji" data-emoji="😶">😶</span>
+                                <span class="emoji" data-emoji="😐">😐</span>
+                                <span class="emoji" data-emoji="😑">😑</span>
+                                <span class="emoji" data-emoji="😬">😬</span>
+                                <span class="emoji" data-emoji="🙄">🙄</span>
+                                <span class="emoji" data-emoji="😯">😯</span>
+                                <span class="emoji" data-emoji="😦">😦</span>
+                                <span class="emoji" data-emoji="😧">😧</span>
+                                <span class="emoji" data-emoji="😮">😮</span>
+                                <span class="emoji" data-emoji="😲">😲</span>
+                                <span class="emoji" data-emoji="🥱">🥱</span>
+                                <span class="emoji" data-emoji="😴">😴</span>
+                                <span class="emoji" data-emoji="🤤">🤤</span>
+                                <span class="emoji" data-emoji="😪">😪</span>
+                                <span class="emoji" data-emoji="😵">😵</span>
+                                <span class="emoji" data-emoji="🤐">🤐</span>
+                                <span class="emoji" data-emoji="🥴">🥴</span>
+                                <span class="emoji" data-emoji="🤢">🤢</span>
+                                <span class="emoji" data-emoji="🤮">🤮</span>
+                                <span class="emoji" data-emoji="🤧">🤧</span>
+                                <span class="emoji" data-emoji="😷">😷</span>
+                                <span class="emoji" data-emoji="🤒">🤒</span>
+                                <span class="emoji" data-emoji="🤕">🤕</span>
+                                <span class="emoji" data-emoji="🤑">🤑</span>
+                                <span class="emoji" data-emoji="🤠">🤠</span>
+                                <span class="emoji" data-emoji="😈">😈</span>
+                                <span class="emoji" data-emoji="👿">👿</span>
+                                <span class="emoji" data-emoji="👹">👹</span>
+                                <span class="emoji" data-emoji="👺">👺</span>
+                                <span class="emoji" data-emoji="🤡">🤡</span>
+                                <span class="emoji" data-emoji="💩">💩</span>
+                                <span class="emoji" data-emoji="👻">👻</span>
+                                <span class="emoji" data-emoji="💀">💀</span>
+                                <span class="emoji" data-emoji="☠️">☠️</span>
+                                <span class="emoji" data-emoji="👽">👽</span>
+                                <span class="emoji" data-emoji="👾">👾</span>
+                                <span class="emoji" data-emoji="🤖">🤖</span>
+                                <span class="emoji" data-emoji="🎃">🎃</span>
+                                <span class="emoji" data-emoji="😺">😺</span>
+                                <span class="emoji" data-emoji="😸">😸</span>
+                                <span class="emoji" data-emoji="😹">😹</span>
+                                <span class="emoji" data-emoji="😻">😻</span>
+                                <span class="emoji" data-emoji="😼">😼</span>
+                                <span class="emoji" data-emoji="😽">😽</span>
+                                <span class="emoji" data-emoji="🙀">🙀</span>
+                                <span class="emoji" data-emoji="😿">😿</span>
+                                <span class="emoji" data-emoji="😾">😾</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
+
