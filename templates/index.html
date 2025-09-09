@@ -4,318 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oleg Messenger</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <div id="app">
-        <!-- Экран входа/регистрации -->
-        <div id="login-screen" class="screen">
-            <div class="login-container">
-                <div class="logo">
-                    <h1><i class="fas fa-comments"></i> Oleg Messenger</h1>
-                    <p>Ваш личный мессенджер</p>
-                </div>
-                
-                <div class="login-form">
-                    <div class="form-group">
-                        <input type="text" id="username-input" placeholder="Введите имя пользователя" maxlength="20">
-                    </div>
-                    <div class="form-group">
-                        <input type="password" id="password-input" placeholder="Введите пароль" maxlength="32">
-                    </div>
-                    <div class="form-buttons">
-                        <button id="login-btn" class="btn btn-primary">
-                            <i class="fas fa-sign-in-alt"></i> Войти
-                        </button>
-                        <button id="register-btn" class="btn btn-secondary">
-                            <i class="fas fa-user-plus"></i> Регистрация
-                        </button>
-                    </div>
-                </div>
-                
-                <div id="login-error" class="error-message"></div>
+        <!-- Левая панель с чатами -->
+        <div class="sidebar">
+            <h2>Oleg</h2>
+            <div id="chat-list"></div>
+            <button id="new-chat-btn">+ Новый чат</button>
+        </div>
+
+        <!-- Центральная область сообщений -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <h3 id="chat-title">Выберите чат</h3>
+            </div>
+            <div class="messages" id="messages"></div>
+            <div class="message-input">
+                <input type="text" id="message-text" placeholder="Введите сообщение...">
+                <button id="send-btn">➤</button>
             </div>
         </div>
 
-        <!-- Основной интерфейс (Discord-like layout) -->
-        <div id="chat-screen" class="hidden">
-            <div class="ds-layout">
-                <div class="servers-bar">
-                    <div class="servers-scroll">
-                        <button id="add-guild-btn" class="server-btn" title="Создать сервер"><i class="fas fa-plus"></i></button>
-                        <div id="guilds-list"></div>
-                    </div>
-                </div>
-
-                <div class="channels-pane">
-                    <div class="channels-header">
-                        <div class="server-title" id="current-guild-name">Выберите сервер</div>
-                        <div class="user-actions">
-                            <span id="current-username"></span>
-                            <button id="open-settings-btn" class="btn-icon" title="Настройки">
-                                <i class="fas fa-gear"></i>
-                            </button>
-                            <button id="open-profile-btn" class="btn-icon" title="Профиль">
-                                <i class="fas fa-user"></i>
-                            </button>
-                            <button id="theme-toggle-btn" class="btn-icon" title="Переключить тему">
-                                <i class="fas fa-moon"></i>
-                            </button>
-                            <button id="logout-btn" class="btn-icon" title="Выйти">
-                                <i class="fas fa-sign-out-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="channels-tabs">
-                        <button id="tab-channels" class="tab active"><i class="fas fa-hashtag"></i> Каналы</button>
-                        <button id="tab-friends" class="tab"><i class="fas fa-user-friends"></i> Друзья</button>
-                    </div>
-
-                    <div id="tab-content-channels">
-                        <div class="channels-section">
-                            <div class="channels-controls">
-                                <span class="section-title"><i class="fas fa-hashtag"></i> Каналы</span>
-                                <div>
-                                    <button id="add-channel-btn" class="btn-icon" title="Создать канал"><i class="fas fa-plus"></i></button>
-                                    <button id="create-invite-btn" class="btn-icon" title="Создать инвайт"><i class="fas fa-user-plus"></i></button>
-                                </div>
-                            </div>
-                            <div id="channels-list" class="channels-list"></div>
-                            <div class="invite-join">
-                                <input type="text" id="invite-code-input" placeholder="Код инвайта">
-                                <button id="join-invite-btn" class="btn-icon" title="Присоединиться"><i class="fas fa-sign-in-alt"></i></button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="tab-content-friends" class="hidden">
-                        <div class="friends-section">
-                            <div class="friend-controls">
-                                <input type="text" id="friend-search-input" placeholder="Поиск по нику">
-                                <button id="friend-search-btn" class="btn-icon" title="Найти">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                            <div id="friend-search-results" class="list"></div>
-                            <div class="friends-lists">
-                                <h5>Заявки входящие</h5>
-                                <div id="friend-requests-in" class="list"></div>
-                                <h5>Заявки исходящие</h5>
-                                <div id="friend-requests-out" class="list"></div>
-                                <h5>Друзья</h5>
-                                <div id="friends-list" class="list"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="chat-area">
-                    <div class="chat-header">
-                        <h3 id="current-room">Выберите канал</h3>
-                        <div class="room-info">
-                            <span id="room-users-count"></span>
-                        </div>
-                    </div>
-                    
-                    <div class="search-container">
-                        <div class="search-wrapper">
-                            <input type="text" id="search-input" placeholder="Поиск по сообщениям..." disabled>
-                            <button id="search-btn" class="btn-search" disabled>
-                                <i class="fas fa-search"></i>
-                            </button>
-                            <button id="clear-search-btn" class="btn-clear-search hidden">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="messages-container">
-                        <div id="messages-list" class="messages-list"></div>
-                    </div>
-                    
-                    <div class="message-input-container">
-                        <div class="message-input-wrapper">
-                            <button id="file-btn" class="btn-file" title="Прикрепить файл">
-                                <i class="fas fa-paperclip"></i>
-                            </button>
-                            <input type="file" id="file-input" accept="image/*,.pdf,.doc,.docx,.txt" style="display: none;">
-                            <button id="emoji-btn" class="btn-emoji" title="Эмодзи">
-                                <i class="fas fa-smile"></i>
-                            </button>
-                            <button id="sticker-btn" class="btn-sticker" title="Стикеры">
-                                <i class="fas fa-sticky-note"></i>
-                            </button>
-                            <button id="poll-btn" class="btn-poll" title="Создать опрос">
-                                <i class="fas fa-poll"></i>
-                            </button>
-                            <input type="text" id="message-input" placeholder="Введите сообщение..." disabled>
-                            <button id="send-btn" class="btn-send" disabled>
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </div>
-                        <div id="file-preview" class="file-preview hidden"></div>
-                        <div id="emoji-picker" class="emoji-picker hidden">
-                            <div class="emoji-grid">
-                                <span class="emoji" data-emoji="😀">😀</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Панель стикеров -->
-                        <div id="sticker-panel" class="sticker-panel hidden">
-                            <div class="sticker-header">
-                                <h4>Стикеры</h4>
-                                <button id="close-sticker-btn" class="btn-icon">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <div class="sticker-grid" id="sticker-grid">
-                                <!-- Стикеры будут загружены динамически -->
-                            </div>
-                        </div>
-                        
-                        <!-- Модальное окно создания опроса -->
-                        <div id="poll-modal" class="modal hidden">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h3>Создать опрос</h3>
-                                    <button id="close-poll-modal" class="btn-icon">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="form-group">
-                                        <label for="poll-question">Вопрос:</label>
-                                        <input type="text" id="poll-question" placeholder="Введите вопрос..." maxlength="200">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Варианты ответов:</label>
-                                        <div id="poll-options">
-                                            <input type="text" class="poll-option" placeholder="Вариант 1" maxlength="100">
-                                            <input type="text" class="poll-option" placeholder="Вариант 2" maxlength="100">
-                                        </div>
-                                        <button id="add-poll-option" class="btn btn-secondary">
-                                            <i class="fas fa-plus"></i> Добавить вариант
-                                        </button>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>
-                                            <input type="checkbox" id="allow-multiple-votes">
-                                            Разрешить множественное голосование
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="poll-expires">Истекает через (часов):</label>
-                                        <select id="poll-expires">
-                                            <option value="">Никогда</option>
-                                            <option value="1">1 час</option>
-                                            <option value="6">6 часов</option>
-                                            <option value="24">1 день</option>
-                                            <option value="168">1 неделя</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button id="cancel-poll" class="btn btn-secondary">Отмена</button>
-                                    <button id="create-poll" class="btn btn-primary">Создать опрос</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- Правая панель участников -->
+        <div class="users-panel">
+            <h3>Участники</h3>
+            <ul id="user-list"></ul>
         </div>
     </div>
 
-    <!-- Профиль (модальное окно) -->
-    <div id="profile-modal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Профиль</h3>
-                <button id="close-profile-btn" class="btn-icon" title="Закрыть">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="profile-row">
-                    <div class="profile-avatar-wrapper">
-                        <img id="profile-avatar" class="profile-avatar" src="" alt="Аватар" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiBmaWxsPSIjOTlhYWI1Ii8+Cjx0ZXh0IHg9IjQ4IiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjMyIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VTwvdGV4dD4KPHN2Zz4='">
-                        <div>
-                            <input type="file" id="avatar-input" accept="image/*" style="display:none;">
-                            <button id="upload-avatar-btn" class="btn btn-secondary"><i class="fas fa-upload"></i> Загрузить аватар</button>
-                        </div>
-                    </div>
-                    <div class="profile-fields">
-                        <label>Статус</label>
-                        <input id="status-input" type="text" maxlength="80" placeholder="Например: Работаю над проектом...">
-                        <label>О себе</label>
-                        <textarea id="bio-input" rows="3" maxlength="200" placeholder="Коротко о себе"></textarea>
-                        <div class="form-buttons" style="margin-top:10px;">
-                            <button id="save-profile-btn" class="btn btn-primary"><i class="fas fa-save"></i> Сохранить</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Настройки (модальное окно) -->
-    <div id="settings-modal" class="modal hidden">
-        <div class="modal-content settings">
-            <div class="modal-header">
-                <h3>Настройки</h3>
-                <button id="close-settings-btn" class="btn-icon" title="Закрыть">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body settings-body">
-                <div class="settings-nav">
-                    <button class="settings-tab active" data-tab="profile">Профиль</button>
-                    <button class="settings-tab" data-tab="notifications">Уведомления</button>
-                    <button class="settings-tab" data-tab="appearance">Внешний вид</button>
-                    <button class="settings-tab" data-tab="voice">Голос и видео</button>
-                </div>
-                <div class="settings-panels">
-                    <div class="settings-panel" data-panel="profile">
-                        <div class="form-group"><label>Статус</label><input id="st-status" type="text" maxlength="80"></div>
-                        <div class="form-group"><label>О себе</label><textarea id="st-bio" rows="3" maxlength="200"></textarea></div>
-                        <button id="st-save-profile" class="btn btn-primary">Сохранить профиль</button>
-                        <hr/>
-                        <div class="form-group">
-                            <button id="st-delete-account" class="btn btn-secondary" style="border-color:#e74c3c;color:#e74c3c">Удалить аккаунт</button>
-                        </div>
-                        <div class="form-group">
-                            <button id="st-export" class="btn btn-secondary">Экспорт данных</button>
-                            <button id="st-import" class="btn btn-secondary">Импорт данных</button>
-                            <input id="st-import-file" type="file" accept="application/json" style="display:none;"/>
-                        </div>
-                    </div>
-                    <div class="settings-panel hidden" data-panel="notifications">
-                        <div class="form-group"><label><input type="checkbox" id="st-notify-desktop"> Уведомления на рабочем столе</label></div>
-                        <div class="form-group"><label><input type="checkbox" id="st-notify-sound"> Звук на новые сообщения</label></div>
-                    </div>
-                    <div class="settings-panel hidden" data-panel="appearance">
-                        <div class="form-group"><label>Тема</label>
-                            <select id="st-theme">
-                                <option value="light">Светлая</option>
-                                <option value="dark">Тёмная</option>
-                            </select>
-                        </div>
-                        <div class="form-group"><label>Компактный режим</label>
-                            <input type="checkbox" id="st-compact">
-                        </div>
-                    </div>
-                    <div class="settings-panel hidden" data-panel="voice">
-                        <p>Настройки голоса/видео будут добавлены позже.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <!-- JS -->
+    <script src="/static/js/app.js"></script>
 </body>
 </html>
-
