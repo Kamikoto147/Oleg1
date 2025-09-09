@@ -38,15 +38,27 @@
             </div>
         </div>
 
-        <!-- Основной интерфейс мессенджера -->
+        <!-- Основной интерфейс (Discord-like layout) -->
         <div id="chat-screen" class="hidden">
-            <div class="chat-container">
-                <!-- Боковая панель -->
-                <div class="sidebar">
-                    <div class="sidebar-header">
-                        <h3><i class="fas fa-comments"></i> Oleg</h3>
-                        <div class="user-info">
+            <div class="ds-layout">
+                <div class="servers-bar">
+                    <div class="servers-scroll">
+                        <button id="add-guild-btn" class="server-btn" title="Создать сервер"><i class="fas fa-plus"></i></button>
+                        <div id="guilds-list"></div>
+                    </div>
+                </div>
+
+                <div class="channels-pane">
+                    <div class="channels-header">
+                        <div class="server-title" id="current-guild-name">Выберите сервер</div>
+                        <div class="user-actions">
                             <span id="current-username"></span>
+                            <button id="open-settings-btn" class="btn-icon" title="Настройки">
+                                <i class="fas fa-gear"></i>
+                            </button>
+                            <button id="open-profile-btn" class="btn-icon" title="Профиль">
+                                <i class="fas fa-user"></i>
+                            </button>
                             <button id="theme-toggle-btn" class="btn-icon" title="Переключить тему">
                                 <i class="fas fa-moon"></i>
                             </button>
@@ -55,32 +67,55 @@
                             </button>
                         </div>
                     </div>
-                    
-                    <div class="sidebar-content">
-                        <div class="section">
-                            <h4><i class="fas fa-users"></i> Пользователи онлайн</h4>
-                            <div id="users-list" class="users-list"></div>
+
+                    <div class="channels-tabs">
+                        <button id="tab-channels" class="tab active"><i class="fas fa-hashtag"></i> Каналы</button>
+                        <button id="tab-friends" class="tab"><i class="fas fa-user-friends"></i> Друзья</button>
+                    </div>
+
+                    <div id="tab-content-channels">
+                        <div class="channels-section">
+                            <div class="channels-controls">
+                                <span class="section-title"><i class="fas fa-hashtag"></i> Каналы</span>
+                                <div>
+                                    <button id="add-channel-btn" class="btn-icon" title="Создать канал"><i class="fas fa-plus"></i></button>
+                                    <button id="create-invite-btn" class="btn-icon" title="Создать инвайт"><i class="fas fa-user-plus"></i></button>
+                                </div>
+                            </div>
+                            <div id="channels-list" class="channels-list"></div>
+                            <div class="invite-join">
+                                <input type="text" id="invite-code-input" placeholder="Код инвайта">
+                                <button id="join-invite-btn" class="btn-icon" title="Присоединиться"><i class="fas fa-sign-in-alt"></i></button>
+                            </div>
                         </div>
-                        
-                        <div class="section">
-                            <h4><i class="fas fa-hashtag"></i> Комнаты</h4>
-                            <div class="room-controls">
-                                <input type="text" id="new-room-input" placeholder="Новая комната">
-                                <button id="create-room-btn" class="btn-icon" title="Создать комнату">
-                                    <i class="fas fa-plus"></i>
+                    </div>
+
+                    <div id="tab-content-friends" class="hidden">
+                        <div class="friends-section">
+                            <div class="friend-controls">
+                                <input type="text" id="friend-search-input" placeholder="Поиск по нику">
+                                <button id="friend-search-btn" class="btn-icon" title="Найти">
+                                    <i class="fas fa-search"></i>
                                 </button>
                             </div>
-                            <div id="rooms-list" class="rooms-list"></div>
+                            <div id="friend-search-results" class="list"></div>
+                            <div class="friends-lists">
+                                <h5>Заявки входящие</h5>
+                                <div id="friend-requests-in" class="list"></div>
+                                <h5>Заявки исходящие</h5>
+                                <div id="friend-requests-out" class="list"></div>
+                                <h5>Друзья</h5>
+                                <div id="friends-list" class="list"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Область чата -->
                 <div class="chat-area">
                     <div class="chat-header">
-                        <h3 id="current-room">Выберите комнату</h3>
+                        <h3 id="current-room">Выберите канал</h3>
                         <div class="room-info">
-                            <span id="room-users-count">0 пользователей</span>
+                            <span id="room-users-count"></span>
                         </div>
                     </div>
                     
@@ -109,6 +144,12 @@
                             <button id="emoji-btn" class="btn-emoji" title="Эмодзи">
                                 <i class="fas fa-smile"></i>
                             </button>
+                            <button id="sticker-btn" class="btn-sticker" title="Стикеры">
+                                <i class="fas fa-sticky-note"></i>
+                            </button>
+                            <button id="poll-btn" class="btn-poll" title="Создать опрос">
+                                <i class="fas fa-poll"></i>
+                            </button>
                             <input type="text" id="message-input" placeholder="Введите сообщение..." disabled>
                             <button id="send-btn" class="btn-send" disabled>
                                 <i class="fas fa-paper-plane"></i>
@@ -118,116 +159,67 @@
                         <div id="emoji-picker" class="emoji-picker hidden">
                             <div class="emoji-grid">
                                 <span class="emoji" data-emoji="😀">😀</span>
-                                <span class="emoji" data-emoji="😃">😃</span>
-                                <span class="emoji" data-emoji="😄">😄</span>
-                                <span class="emoji" data-emoji="😁">😁</span>
-                                <span class="emoji" data-emoji="😆">😆</span>
-                                <span class="emoji" data-emoji="😅">😅</span>
-                                <span class="emoji" data-emoji="😂">😂</span>
-                                <span class="emoji" data-emoji="🤣">🤣</span>
-                                <span class="emoji" data-emoji="😊">😊</span>
-                                <span class="emoji" data-emoji="😇">😇</span>
-                                <span class="emoji" data-emoji="🙂">🙂</span>
-                                <span class="emoji" data-emoji="🙃">🙃</span>
-                                <span class="emoji" data-emoji="😉">😉</span>
-                                <span class="emoji" data-emoji="😌">😌</span>
-                                <span class="emoji" data-emoji="😍">😍</span>
-                                <span class="emoji" data-emoji="🥰">🥰</span>
-                                <span class="emoji" data-emoji="😘">😘</span>
-                                <span class="emoji" data-emoji="😗">😗</span>
-                                <span class="emoji" data-emoji="😙">😙</span>
-                                <span class="emoji" data-emoji="😚">😚</span>
-                                <span class="emoji" data-emoji="😋">😋</span>
-                                <span class="emoji" data-emoji="😛">😛</span>
-                                <span class="emoji" data-emoji="😝">😝</span>
-                                <span class="emoji" data-emoji="😜">😜</span>
-                                <span class="emoji" data-emoji="🤪">🤪</span>
-                                <span class="emoji" data-emoji="🤨">🤨</span>
-                                <span class="emoji" data-emoji="🧐">🧐</span>
-                                <span class="emoji" data-emoji="🤓">🤓</span>
-                                <span class="emoji" data-emoji="😎">😎</span>
-                                <span class="emoji" data-emoji="🤩">🤩</span>
-                                <span class="emoji" data-emoji="🥳">🥳</span>
-                                <span class="emoji" data-emoji="😏">😏</span>
-                                <span class="emoji" data-emoji="😒">😒</span>
-                                <span class="emoji" data-emoji="😞">😞</span>
-                                <span class="emoji" data-emoji="😔">😔</span>
-                                <span class="emoji" data-emoji="😟">😟</span>
-                                <span class="emoji" data-emoji="😕">😕</span>
-                                <span class="emoji" data-emoji="🙁">🙁</span>
-                                <span class="emoji" data-emoji="☹️">☹️</span>
-                                <span class="emoji" data-emoji="😣">😣</span>
-                                <span class="emoji" data-emoji="😖">😖</span>
-                                <span class="emoji" data-emoji="😫">😫</span>
-                                <span class="emoji" data-emoji="😩">😩</span>
-                                <span class="emoji" data-emoji="🥺">🥺</span>
-                                <span class="emoji" data-emoji="😢">😢</span>
-                                <span class="emoji" data-emoji="😭">😭</span>
-                                <span class="emoji" data-emoji="😤">😤</span>
-                                <span class="emoji" data-emoji="😠">😠</span>
-                                <span class="emoji" data-emoji="😡">😡</span>
-                                <span class="emoji" data-emoji="🤬">🤬</span>
-                                <span class="emoji" data-emoji="🤯">🤯</span>
-                                <span class="emoji" data-emoji="😳">😳</span>
-                                <span class="emoji" data-emoji="🥵">🥵</span>
-                                <span class="emoji" data-emoji="🥶">🥶</span>
-                                <span class="emoji" data-emoji="😱">😱</span>
-                                <span class="emoji" data-emoji="😨">😨</span>
-                                <span class="emoji" data-emoji="😰">😰</span>
-                                <span class="emoji" data-emoji="😥">😥</span>
-                                <span class="emoji" data-emoji="😓">😓</span>
-                                <span class="emoji" data-emoji="🤗">🤗</span>
-                                <span class="emoji" data-emoji="🤔">🤔</span>
-                                <span class="emoji" data-emoji="🤭">🤭</span>
-                                <span class="emoji" data-emoji="🤫">🤫</span>
-                                <span class="emoji" data-emoji="🤥">🤥</span>
-                                <span class="emoji" data-emoji="😶">😶</span>
-                                <span class="emoji" data-emoji="😐">😐</span>
-                                <span class="emoji" data-emoji="😑">😑</span>
-                                <span class="emoji" data-emoji="😬">😬</span>
-                                <span class="emoji" data-emoji="🙄">🙄</span>
-                                <span class="emoji" data-emoji="😯">😯</span>
-                                <span class="emoji" data-emoji="😦">😦</span>
-                                <span class="emoji" data-emoji="😧">😧</span>
-                                <span class="emoji" data-emoji="😮">😮</span>
-                                <span class="emoji" data-emoji="😲">😲</span>
-                                <span class="emoji" data-emoji="🥱">🥱</span>
-                                <span class="emoji" data-emoji="😴">😴</span>
-                                <span class="emoji" data-emoji="🤤">🤤</span>
-                                <span class="emoji" data-emoji="😪">😪</span>
-                                <span class="emoji" data-emoji="😵">😵</span>
-                                <span class="emoji" data-emoji="🤐">🤐</span>
-                                <span class="emoji" data-emoji="🥴">🥴</span>
-                                <span class="emoji" data-emoji="🤢">🤢</span>
-                                <span class="emoji" data-emoji="🤮">🤮</span>
-                                <span class="emoji" data-emoji="🤧">🤧</span>
-                                <span class="emoji" data-emoji="😷">😷</span>
-                                <span class="emoji" data-emoji="🤒">🤒</span>
-                                <span class="emoji" data-emoji="🤕">🤕</span>
-                                <span class="emoji" data-emoji="🤑">🤑</span>
-                                <span class="emoji" data-emoji="🤠">🤠</span>
-                                <span class="emoji" data-emoji="😈">😈</span>
-                                <span class="emoji" data-emoji="👿">👿</span>
-                                <span class="emoji" data-emoji="👹">👹</span>
-                                <span class="emoji" data-emoji="👺">👺</span>
-                                <span class="emoji" data-emoji="🤡">🤡</span>
-                                <span class="emoji" data-emoji="💩">💩</span>
-                                <span class="emoji" data-emoji="👻">👻</span>
-                                <span class="emoji" data-emoji="💀">💀</span>
-                                <span class="emoji" data-emoji="☠️">☠️</span>
-                                <span class="emoji" data-emoji="👽">👽</span>
-                                <span class="emoji" data-emoji="👾">👾</span>
-                                <span class="emoji" data-emoji="🤖">🤖</span>
-                                <span class="emoji" data-emoji="🎃">🎃</span>
-                                <span class="emoji" data-emoji="😺">😺</span>
-                                <span class="emoji" data-emoji="😸">😸</span>
-                                <span class="emoji" data-emoji="😹">😹</span>
-                                <span class="emoji" data-emoji="😻">😻</span>
-                                <span class="emoji" data-emoji="😼">😼</span>
-                                <span class="emoji" data-emoji="😽">😽</span>
-                                <span class="emoji" data-emoji="🙀">🙀</span>
-                                <span class="emoji" data-emoji="😿">😿</span>
-                                <span class="emoji" data-emoji="😾">😾</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Панель стикеров -->
+                        <div id="sticker-panel" class="sticker-panel hidden">
+                            <div class="sticker-header">
+                                <h4>Стикеры</h4>
+                                <button id="close-sticker-btn" class="btn-icon">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="sticker-grid" id="sticker-grid">
+                                <!-- Стикеры будут загружены динамически -->
+                            </div>
+                        </div>
+                        
+                        <!-- Модальное окно создания опроса -->
+                        <div id="poll-modal" class="modal hidden">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h3>Создать опрос</h3>
+                                    <button id="close-poll-modal" class="btn-icon">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label for="poll-question">Вопрос:</label>
+                                        <input type="text" id="poll-question" placeholder="Введите вопрос..." maxlength="200">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Варианты ответов:</label>
+                                        <div id="poll-options">
+                                            <input type="text" class="poll-option" placeholder="Вариант 1" maxlength="100">
+                                            <input type="text" class="poll-option" placeholder="Вариант 2" maxlength="100">
+                                        </div>
+                                        <button id="add-poll-option" class="btn btn-secondary">
+                                            <i class="fas fa-plus"></i> Добавить вариант
+                                        </button>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>
+                                            <input type="checkbox" id="allow-multiple-votes">
+                                            Разрешить множественное голосование
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="poll-expires">Истекает через (часов):</label>
+                                        <select id="poll-expires">
+                                            <option value="">Никогда</option>
+                                            <option value="1">1 час</option>
+                                            <option value="6">6 часов</option>
+                                            <option value="24">1 день</option>
+                                            <option value="168">1 неделя</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="cancel-poll" class="btn btn-secondary">Отмена</button>
+                                    <button id="create-poll" class="btn btn-primary">Создать опрос</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -236,7 +228,93 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <!-- Профиль (модальное окно) -->
+    <div id="profile-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Профиль</h3>
+                <button id="close-profile-btn" class="btn-icon" title="Закрыть">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="profile-row">
+                    <div class="profile-avatar-wrapper">
+                        <img id="profile-avatar" class="profile-avatar" src="" alt="Аватар" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiBmaWxsPSIjOTlhYWI1Ii8+Cjx0ZXh0IHg9IjQ4IiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjMyIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VTwvdGV4dD4KPHN2Zz4='">
+                        <div>
+                            <input type="file" id="avatar-input" accept="image/*" style="display:none;">
+                            <button id="upload-avatar-btn" class="btn btn-secondary"><i class="fas fa-upload"></i> Загрузить аватар</button>
+                        </div>
+                    </div>
+                    <div class="profile-fields">
+                        <label>Статус</label>
+                        <input id="status-input" type="text" maxlength="80" placeholder="Например: Работаю над проектом...">
+                        <label>О себе</label>
+                        <textarea id="bio-input" rows="3" maxlength="200" placeholder="Коротко о себе"></textarea>
+                        <div class="form-buttons" style="margin-top:10px;">
+                            <button id="save-profile-btn" class="btn btn-primary"><i class="fas fa-save"></i> Сохранить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Настройки (модальное окно) -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-content settings">
+            <div class="modal-header">
+                <h3>Настройки</h3>
+                <button id="close-settings-btn" class="btn-icon" title="Закрыть">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body settings-body">
+                <div class="settings-nav">
+                    <button class="settings-tab active" data-tab="profile">Профиль</button>
+                    <button class="settings-tab" data-tab="notifications">Уведомления</button>
+                    <button class="settings-tab" data-tab="appearance">Внешний вид</button>
+                    <button class="settings-tab" data-tab="voice">Голос и видео</button>
+                </div>
+                <div class="settings-panels">
+                    <div class="settings-panel" data-panel="profile">
+                        <div class="form-group"><label>Статус</label><input id="st-status" type="text" maxlength="80"></div>
+                        <div class="form-group"><label>О себе</label><textarea id="st-bio" rows="3" maxlength="200"></textarea></div>
+                        <button id="st-save-profile" class="btn btn-primary">Сохранить профиль</button>
+                        <hr/>
+                        <div class="form-group">
+                            <button id="st-delete-account" class="btn btn-secondary" style="border-color:#e74c3c;color:#e74c3c">Удалить аккаунт</button>
+                        </div>
+                        <div class="form-group">
+                            <button id="st-export" class="btn btn-secondary">Экспорт данных</button>
+                            <button id="st-import" class="btn btn-secondary">Импорт данных</button>
+                            <input id="st-import-file" type="file" accept="application/json" style="display:none;"/>
+                        </div>
+                    </div>
+                    <div class="settings-panel hidden" data-panel="notifications">
+                        <div class="form-group"><label><input type="checkbox" id="st-notify-desktop"> Уведомления на рабочем столе</label></div>
+                        <div class="form-group"><label><input type="checkbox" id="st-notify-sound"> Звук на новые сообщения</label></div>
+                    </div>
+                    <div class="settings-panel hidden" data-panel="appearance">
+                        <div class="form-group"><label>Тема</label>
+                            <select id="st-theme">
+                                <option value="light">Светлая</option>
+                                <option value="dark">Тёмная</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Компактный режим</label>
+                            <input type="checkbox" id="st-compact">
+                        </div>
+                    </div>
+                    <div class="settings-panel hidden" data-panel="voice">
+                        <p>Настройки голоса/видео будут добавлены позже.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
